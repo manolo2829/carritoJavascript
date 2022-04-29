@@ -33,6 +33,15 @@ function addToCarritoItem(e){
 
 // ESTA FUNCION TOMA EL NUEVO CARRIT
 function addItemCarrito(newItem){
+
+    for(let i=0; i < carrito.length; i++){
+        // EL TRIM QUITA LOS ESPACIOS QUE ESTEN A LOS LADOS ASI NOS GARANTIZAMOS QUE ESTEN IGUALES
+        if(carrito[i].title.trim() === newItem.title.trim()){
+            carrito[i].cantidad++;
+            return null;
+        }
+    }
+
     // LO AÑADE AL CARRITO GENERAL
     carrito.push(newItem)
 
