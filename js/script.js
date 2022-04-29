@@ -34,11 +34,20 @@ function addToCarritoItem(e){
 // ESTA FUNCION TOMA EL NUEVO CARRIT
 function addItemCarrito(newItem){
 
+    // OBTENEMOS EL INPUT DE LA TABLA
+    const inputElement = tbody.getElementsByClassName('input__element')
+
     for(let i=0; i < carrito.length; i++){
         // EL TRIM QUITA LOS ESPACIOS QUE ESTEN A LOS LADOS ASI NOS GARANTIZAMOS QUE ESTEN IGUALES
         if(carrito[i].title.trim() === newItem.title.trim()){
+            // LE SUMAMOS 1 A LA CANTIDAD
             carrito[i].cantidad++;
+            // LUEGO OBTENEMOS EL VALOR DEL INPUT Y LE SUMAMOS 1
+            const inputValue = inputElement[i];
+            inputValue.value++;
+            carritoTotal()
             return null;
+            // TODO ESTO SUCEDE SI MARCAMOS DE VUELTA EL MISMO ELEMENTO
         }
     }
 
@@ -66,7 +75,7 @@ function renderCarrito(){
         </td>
         <td class="table__price">${item.price}</td>
         <td class="table__cantidad">
-            <input type="number" min="1" value=${item.cantidad}>
+            <input type="number" min="1" value=${item.cantidad} class='input__element'>
             <button class="delete btn btn-danger">x</button>
         </td>
         `
@@ -75,5 +84,75 @@ function renderCarrito(){
         // LUEGO LO AGREGAMOS AL TBODY
         tbody.appendChild(tr)
 
+        tr.querySelector('.delete').addEventListener('click', removeItemCarrito)
+        tr.querySelector('.input__element').addEventListener('change', sumaCantidad)
+
     })
+    carritoTotal()
+}
+
+
+
+function carritoTotal(){
+    let total = 0
+    // SELECCIONAMOS EL TEXTO QUE TIENE EL TOTAL DEL CARRITO
+    const itemCartTotal = document.querySelector('.itemCartTotal')
+    console.log(itemCartTotal)
+    // RECORREMOS EL CARRITO Y OBTENEMOS LOS DISTINTOS PRECIOS
+    carrito.forEach((item) => {
+        // OBTENEMOS EL PRECIO DE CADA ITEM DEL CARRITO
+        // PERO LE SACAMOS EL SIMBOLO $ Y LO TRANSFORMAMOS EN NUMERO
+        const precio = Number(item.price.replace("$", ''));
+        total = total + precio*item.cantidad
+    })
+
+    itemCartTotal.innerHTML = `Total $${total}`
+}
+
+function removeItemCarrito(e){
+    // CON EL TARGET OBTENEMOS EL ELEMENTO QUE LLAMOS A EVENTLISTENING
+    const buttonDelete = e.target
+    const tr = buttonDelete.closest('.itemCarrito')
+    // OBTENEMOS EL TITULO DE ESTE ITEM PARA DESPUES COMPARARLO
+    const title = tr.querySelector('.title').textContent;
+    // RECORREMOS EL CARRITO
+    for(let i = 0; i < carrito.length; i++){
+        // Y LE DECIMOS QUE SI EL TITULO DE LA CARTA MAS CERCANO AL BOTON DELETE QUE SELECCIONAMOS ES IGUAL AL DEL CARRITO
+        if(carrito[i].title.trim() === title.trim()){
+            // LO VAMOS A SACAR DEL ARRAY
+            carrito.splice(i, 1)
+        }
+    }
+    tr.remove()
+    carritoTotal()
+}
+
+function sumaCantidad(e){
+    const sumaInput = e.target;
+    // OBTENEMOS EL ITEM MAS CERCANO AL BOTON QUE EJECUTA LA FUNCION
+    const tr = sumaInput.closest('.itemCarrito')
+    const title = tr.querySelector('.title').textContent;
+    carrito.forEach((item) =>{
+        // RECORREMOS EL CARRITO PARA ENCONTRAR EL VALOR DEL ITEM
+        if(item.title.trim() === title){
+            sumaInput < 1 ? (sumaInput.value = 1) : sumaInput.value;
+            // LE CAMBIAMOS LA CANTIDAD
+            item.cantidad = sumaInput.value;
+            // ACTUALIZAMOS EL PRECIO
+            carritoTotal()
+        }
+    })
+    console.log(carrito)
+}
+
+function addLocalStorage(){
+    localStorage.setItem('carrito', JSON.stringify(carrito))
+}
+
+windows.onload = function(){
+    const storage = JSON.parse(localStorage.getItem('carrito'));
+    if(storage){
+        carrito = storage;
+        renderCarrito()
+    }
 }
