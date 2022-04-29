@@ -34,6 +34,12 @@ function addToCarritoItem(e){
 // ESTA FUNCION TOMA EL NUEVO CARRIT
 function addItemCarrito(newItem){
 
+    const alert = document.querySelector('.alert')
+    setTimeout( function(){
+        alert.classList.add('hide')
+    }, 2000)
+    alert.classList.remove('hide')
+
     // OBTENEMOS EL INPUT DE LA TABLA
     const inputElement = tbody.getElementsByClassName('input__element')
 
@@ -107,6 +113,7 @@ function carritoTotal(){
     })
 
     itemCartTotal.innerHTML = `Total $${total}`
+    addLocalStorage()
 }
 
 function removeItemCarrito(e){
@@ -123,6 +130,13 @@ function removeItemCarrito(e){
             carrito.splice(i, 1)
         }
     }
+
+    const alert = document.querySelector('.remove')
+    setTimeout( function(){
+        alert.classList.add('remove')
+    }, 2000)
+    alert.classList.remove('remove')
+
     tr.remove()
     carritoTotal()
 }
@@ -149,7 +163,7 @@ function addLocalStorage(){
     localStorage.setItem('carrito', JSON.stringify(carrito))
 }
 
-windows.onload = function(){
+window.onload = function(){
     const storage = JSON.parse(localStorage.getItem('carrito'));
     if(storage){
         carrito = storage;
